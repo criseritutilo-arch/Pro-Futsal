@@ -2078,12 +2078,12 @@ export default function App() {
                             : 'bg-zinc-900/50 hover:bg-zinc-800 border-transparent hover:border-zinc-700'
                         }`}
                       >
-                        <div>
-                          <h4 className={`font-bold text-sm transition-colors ${isAlreadyAdded ? 'text-zinc-500' : 'text-zinc-200 group-hover:text-lime-400'}`}>
+                        <span className="block">
+                          <span className={`block font-bold text-sm transition-colors ${isAlreadyAdded ? 'text-zinc-500' : 'text-zinc-200 group-hover:text-lime-400'}`}>
                             {ex.title} {isAlreadyAdded && '(Já adicionado)'}
-                          </h4>
-                          <p className="text-xs text-zinc-500 mt-1">{ex.category}</p>
-                        </div>
+                          </span>
+                          <span className="block text-xs text-zinc-500 mt-1">{ex.category}</span>
+                        </span>
                         {!isAlreadyAdded && (
                           <Plus className="w-4 h-4 text-zinc-600 group-hover:text-lime-400 transition-colors" />
                         )}
