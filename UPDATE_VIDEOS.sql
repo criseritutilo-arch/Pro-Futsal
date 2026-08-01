@@ -1,0 +1,34 @@
+-- Run this SQL in your Supabase SQL Editor to update the videos
+
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=2C-uNgKwPLE' WHERE id = 'e1';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=52r_Ul5k03g' WHERE id = 'e2';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=1T4wT8bA8eI' WHERE id = 'e3';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=d8AsvYq41mY' WHERE id = 'e4';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=132K0-yFDBQ' WHERE id = 'e5';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=4w_6I0E_8k0' WHERE id = 'e6';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=n-95H_U-OEE' WHERE id = 'e7';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=IikPVKq6-yM' WHERE id = 'e8';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=aYkeIG2Qx-g' WHERE id = 'e9';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=j_z0X2Yw5rA' WHERE id = 'e10';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=cK2P1P1vU0A' WHERE id = 'e11';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=_yT8QkM37iU' WHERE id = 'e12';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=YQmpswKEq9I' WHERE id = 'e13';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=4XLEnwUr1d8' WHERE id = 'e14';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=wiFvgqr8KUY' WHERE id = 'e15';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=pSHjTRCQxIw' WHERE id = 'e16';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=NXr4Fv8MvX0' WHERE id = 'e17';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=FkAzeYJGoEA' WHERE id = 'e18';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=5_d4u2U0t9I' WHERE id = 'e19';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=q6t8rGk9Dcw' WHERE id = 'e20';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=9_C8TXY8Mps' WHERE id = 'e21';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=Fj-E_wSntr4' WHERE id = 'e22';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=wXvO3O5m1wA' WHERE id = 'e23';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=z8o5jZqj-vM' WHERE id = 'e24';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=A-cFAWvGKEI' WHERE id = 'e25';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=KAOou9uA9cQ' WHERE id = 'e26';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=qQJqWd-2yC0' WHERE id = 'e27';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=Rx_UHMnQljU' WHERE id = 'e28';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=JtV5aG_iH14' WHERE id = 'e29';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=w_1b7Y5wV4I' WHERE id = 'e30';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=bEv6CCg2BC8' WHERE id = 'e31';
+UPDATE exercises SET "videoUrl" = 'https://www.youtube.com/watch?v=SEdqd1n0cvg' WHERE id = 'e32';

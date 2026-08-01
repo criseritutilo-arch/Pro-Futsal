@@ -1,0 +1,31 @@
+  const handleDrop = (e: React.DragEvent, dayIndex: number, dropIndex: number) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.dayIndex !== dayIndex || draggedItem.exerciseIndex === dropIndex) {
+      handleDragEnd();
+      return;
+    }
+
+    if (selectedPlanId) {
+      setPlans(prev => prev.map(p => {
+        if (    }
+    handleDragEnd();
+  };
+
+  const handleRemoveExerciseFromPlan = (e: React.MouseEvent, dayIndex: number, exerciseIndex: number) => {emp = newExercises[exerciseIndex + 1];
+            newExercises[exerciseIndex + 1] = newExercises[exerciseIndex];
+            newExercises[exerciseIndex] = temp;
+          }
+
+          newDays[dayIndex] = {
+            ...newDays[dayIndex],
+            exercises: newExercises
+          };
+          return { ...p, days: newDays };
+        }
+        return p;
+      }));
+    }
+  };
+
+  const handleRemoveExerciseFromPlan = (e: React.MouseEvent, dayIndex: number, exerciseIndex: number) => {
+    e.stopPropagation();

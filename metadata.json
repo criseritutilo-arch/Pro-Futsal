@@ -1,0 +1,8 @@
+{
+  "name": "Futsal Pro Performance",
+  "description": "App de exercícios de força e potência para futsal de alto nível, com planos de treino periodizados e vídeos demonstrativos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
