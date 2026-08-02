@@ -1230,15 +1230,6 @@ export default function App() {
     setShowEditModal(false);
   };
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0B] flex flex-col justify-center items-center">
-        <Loader2 className="w-8 h-8 text-lime-400 animate-spin mb-4" />
-        <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm">Carregando...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-zinc-100 font-sans selection:bg-lime-400/30 selection:text-lime-200 pb-20">
       
