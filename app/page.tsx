@@ -884,21 +884,53 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const savedPlans = localStorage.getItem('futsal_training_plans');
-    if (savedPlans) {
-      try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPlans(JSON.parse(savedPlans));
-      } catch (e) {
-        console.error('Failed to parse plans from local storage', e);
+    async function loadPlans() {
+      let loadedFromSupabase = false;
+      if (supabase) {
+        try {
+          const { data, error } = await supabase.from('training_plans').select('*');
+          if (!error && data && data.length > 0) {
+            // Sort by created_at descending if needed, or assume they are correct
+            setPlans(data);
+            loadedFromSupabase = true;
+          }
+        } catch (e) {
+          console.error("Supabase plans fetch error", e);
+        }
       }
+
+      if (!loadedFromSupabase) {
+        const savedPlans = localStorage.getItem('futsal_training_plans');
+        if (savedPlans) {
+          try {
+            setPlans(JSON.parse(savedPlans));
+          } catch (e) {
+            console.error('Failed to parse plans from local storage', e);
+          }
+        }
+      }
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
+    
+    loadPlans();
   }, []);
 
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('futsal_training_plans', JSON.stringify(plans));
+      
+      const saveToSupabase = async () => {
+        if (!supabase) return;
+        try {
+          if (plans.length > 0) {
+            await supabase.from('training_plans').upsert(plans);
+          }
+        } catch (e) {
+          console.error("Failed to sync plans to Supabase", e);
+        }
+      };
+      
+      saveToSupabase();
     }
   }, [plans, isLoaded]);
   
@@ -1047,12 +1079,21 @@ export default function App() {
     setDeleteConfirmId(id);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteConfirmId) {
       setPlans(prev => prev.filter(p => p.id !== deleteConfirmId));
       if (selectedPlanId === deleteConfirmId) {
         setSelectedPlanId(null);
       }
+      
+      if (supabase) {
+        try {
+          await supabase.from('training_plans').delete().eq('id', deleteConfirmId);
+        } catch (e) {
+          console.error("Failed to delete plan from Supabase", e);
+        }
+      }
+      
       setDeleteConfirmId(null);
     }
   };

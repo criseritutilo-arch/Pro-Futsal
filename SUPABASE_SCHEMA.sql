@@ -53,3 +53,28 @@ VALUES
 ('e30', 'Sprint com Trenó', 'Potência', 'Trabalho de aceleração resistida, ideal para gerar os primeiros passos rápidos na quadra.', '5', '15 a 20 metros', '2 min', 'https://picsum.photos/seed/sledsprint/800/450', ARRAY['Prenda-se ao cinturão do trenó.', 'Posicione o corpo inclinado para a frente com a mecânica correta de aceleração.', 'Arranque de forma explosiva, empurrando o chão com força para trás.', 'Corra a distância estipulada e recupere totalmente.']),
 ('e31', 'Back Squat', 'Força Máxima', 'Agachamento com barra nas costas, o exercício base para ganho geral de força nos membros inferiores.', '4', '4 a 6', '3 min', 'https://picsum.photos/seed/backsquat/800/450', ARRAY['Apoie a barra nos trapézios e segure firme.', 'Fique com os pés ligeiramente mais largos que os ombros.', 'Desça o quadril para trás e para baixo até quebrar o paralelo (ou no limite da mobilidade).', 'Empurre de volta à posição inicial estendendo quadril e joelhos.']),
 ('e32', 'Hip Thrust', 'Força Máxima', 'Focado principalmente na força de extensão do quadril, essencial para piques e saltos.', '4', '6 a 8', '2 a 3 min', 'https://picsum.photos/seed/hipthrust/800/450', ARRAY['Apoie a parte superior das costas em um banco e coloque uma barra sobre o quadril.', 'Os pés devem ficar no chão afastados na largura dos ombros.', 'Desça o quadril e, em seguida, empurre a barra para cima estendendo o quadril explosivamente.', 'Contraia os glúteos no topo do movimento.']);
+
+-- Tabela para salvar os planos de treino
+CREATE TABLE IF NOT EXISTS training_plans (
+  id text PRIMARY KEY,
+  title text NOT NULL,
+  phase text NOT NULL,
+  duration text NOT NULL,
+  description text NOT NULL,
+  days jsonb NOT NULL,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+ALTER TABLE training_plans ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access on training_plans" ON training_plans;
+CREATE POLICY "Allow public read access on training_plans" ON training_plans FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow public insert access on training_plans" ON training_plans;
+CREATE POLICY "Allow public insert access on training_plans" ON training_plans FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public update access on training_plans" ON training_plans;
+CREATE POLICY "Allow public update access on training_plans" ON training_plans FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Allow public delete access on training_plans" ON training_plans;
+CREATE POLICY "Allow public delete access on training_plans" ON training_plans FOR DELETE USING (true);
