@@ -1,5 +1,6 @@
--- Tabela de exercícios
-CREATE TABLE IF NOT EXISTS public.exercises (
+-- Run this SQL in your Supabase SQL Editor to create the table and seed the initial data
+
+CREATE TABLE IF NOT EXISTS exercises (
   id text PRIMARY KEY,
   title text NOT NULL,
   category text NOT NULL,
@@ -12,18 +13,49 @@ CREATE TABLE IF NOT EXISTS public.exercises (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Permissões para a tabela de exercícios
-GRANT ALL ON TABLE public.exercises TO anon;
-GRANT ALL ON TABLE public.exercises TO authenticated;
-GRANT ALL ON TABLE public.exercises TO service_role;
+-- Create a policy allowing anyone to read (for the app to fetch data)
+ALTER TABLE exercises ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read access on exercises" ON exercises;
+CREATE POLICY "Allow public read access on exercises" ON exercises FOR SELECT USING (true);
 
-ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Allow public read access on exercises" ON public.exercises;
-CREATE POLICY "Allow public read access on exercises" ON public.exercises FOR SELECT USING (true);
+-- Insert all exercises
+INSERT INTO exercises (id, title, category, description, sets, reps, rest, "videoPlaceholder", instructions)
+VALUES
+('e1', 'Agachamento Búlgaro com Halteres', 'Força Máxima', 'Excelente para força unilateral e estabilidade do joelho e quadril, fundamentais para a mudança de direção no futsal.', '3 a 4', '6 a 8 (cada perna)', '90 a 120s', 'https://picsum.photos/seed/bulgarian/800/450', ARRAY['Posicione um pé no banco atrás de você.', 'Segure um haltere em cada mão com os braços estendidos.', 'Desça o quadril até que a coxa da frente fique paralela ao chão.', 'Empurre o chão com o pé da frente para retornar à posição inicial.']),
+('e2', 'Salto na Caixa (Box Jump)', 'Pliometria', 'Desenvolve potência explosiva concêntrica, simulando o arranque de sprints curtos.', '4', '4 a 5', '2 a 3 min', 'https://picsum.photos/seed/boxjump/800/450', ARRAY['Posicione-se de frente para uma caixa pliométrica (45-60cm).', 'Faça um balanço com os braços e desça o quadril rapidamente.', 'Salte de forma explosiva, aterrissando suavemente sobre a caixa.', 'Desça da caixa um pé de cada vez (não pule de costas).']),
+('e3', 'Puxada de Arranco (Snatch Pull)', 'Potência', 'Exercício derivado de LPO para maximizar a tripla extensão (tornozelo, joelho e quadril).', '4', '3 a 5', '3 min', 'https://picsum.photos/seed/snatch/800/450', ARRAY['Posicione os pés na largura dos ombros com pegada aberta na barra.', 'Inicie a puxada do chão, mantendo a barra próxima ao corpo.', 'Ao passar dos joelhos, estenda explosivamente o quadril e fique nas pontas dos pés.', 'Encolha os ombros no final do movimento, sem flexionar os cotovelos.']),
+('e4', 'Flexão Nórdica', 'Prevenção', 'Essencial para a prevenção de lesões nos isquiotibiais, muito comuns devido às frenagens bruscas.', '3', '5 a 6', '90s', 'https://picsum.photos/seed/nordic/800/450', ARRAY['Ajoelhe-se em uma superfície macia com alguém (ou um equipamento) segurando seus calcanhares.', 'Mantenha o corpo alinhado do joelho aos ombros.', 'Deixe-se cair para a frente de forma controlada o mais lento possível.', 'Use as mãos para amortecer a queda ao final e empurre-se de volta ao início.']),
+('e5', 'Levantamento Terra com Trap Bar', 'Força Máxima', 'Constrói força geral nas pernas e core com menor tensão na lombar que a barra reta.', '4', '4 a 6', '3 min', 'https://picsum.photos/seed/trapbar/800/450', ARRAY['Fique dentro da barra hexagonal.', 'Desça o quadril e segure as alças, mantendo a coluna neutra e o peito estufado.', 'Empurre o chão com os pés para levantar o peso.', 'Estenda o quadril completamente no topo e retorne com controle.']),
+('e6', 'Skater Jumps (Saltos Laterais)', 'Pliometria', 'Trabalha potência no plano frontal, replicando movimentos defensivos e mudanças de direção laterais.', '3', '6 a 8 (cada lado)', '90s', 'https://picsum.photos/seed/skater/800/450', ARRAY['Inicie apoiado em uma perna só, com o joelho ligeiramente flexionado.', 'Salte lateralmente para a outra perna de forma explosiva.', 'Aterrisse estabilizando o corpo rapidamente.', 'Imediatamente repita o salto de volta para a perna inicial.']),
+('e7', 'Pallof Press Dinâmico', 'Core', 'Treinamento anti-rotacional do core, vital para estabilizar o tronco durante chutes e disputas de bola.', '3', '10 a 12 (cada lado)', '60s', 'https://picsum.photos/seed/pallof/800/450', ARRAY['Prenda um elástico ou cabo na altura do peito, ao lado do corpo.', 'Segure a alça com ambas as mãos no centro do peito.', 'Empurre os braços para frente, resistindo à tração que tenta rodar seu tronco.', 'Retorne ao centro de forma controlada.']),
+('e8', 'Mobilidade de Tornozelo na Parede', 'Mobilidade', 'Melhora a dorsiflexão do tornozelo, crucial para agachamentos profundos e prevenção de lesões na aterrissagem.', '2', '10 (cada perna)', '30s', 'https://picsum.photos/seed/ankle/800/450', ARRAY['Fique de frente para uma parede com um pé à frente do outro.', 'Mantenha o calcanhar da frente no chão.', 'Dobre o joelho da frente tentando encostar na parede.', 'Retorne à posição inicial.']),
+('e9', 'Rotação 90/90 de Quadril', 'Mobilidade', 'Aumenta a amplitude de rotação interna e externa do quadril, fundamental para a mudança rápida de direção.', '2', '60s (cada lado)', '30s', 'https://picsum.photos/seed/hip9090/800/450', ARRAY['Sente-se no chão com ambas as pernas flexionadas a 90 graus, uma à frente e outra ao lado.', 'Mantenha o tronco ereto e o peito aberto.', 'Gire o tronco em direção à perna da frente e desça levemente.', 'Troque o lado das pernas girando sobre os calcanhares.']),
+('e10', 'Rotação Torácica em 4 Apoios', 'Mobilidade', 'Libera a coluna torácica para permitir melhor rotação do tronco, essencial para passes e chutes.', '2', '8 (cada lado)', '30s', 'https://picsum.photos/seed/tspine/800/450', ARRAY['Fique na posição de 4 apoios (mãos e joelhos no chão).', 'Coloque uma mão atrás da cabeça.', 'Gire o cotovelo dobrado em direção ao braço de apoio.', 'Abra o peito e aponte o cotovelo para o teto, seguindo com o olhar.']),
+('e11', 'Mobilidade Ativa de Isquiotibiais', 'Mobilidade', 'Alongamento dinâmico para os isquiotibiais, preparando a musculatura para sprints e estiramentos.', '2', '10 (cada perna)', '30s', 'https://picsum.photos/seed/hamstring/800/450', ARRAY['Deite-se de costas com uma perna estendida no chão.', 'Levante a outra perna o mais alto possível, mantendo-a reta.', 'Segure levemente atrás do joelho ou panturrilha e puxe suavemente.', 'Retorne a perna ao chão de forma controlada.']),
+('e12', 'Mobilidade de Adutores (Rockback)', 'Mobilidade', 'Aumenta a flexibilidade na parte interna das coxas, permitindo passadas mais largas e laterais mais eficientes.', '2', '8 (cada lado)', '30s', 'https://picsum.photos/seed/adductor/800/450', ARRAY['Fique em 4 apoios e estenda uma perna lateralmente com o pé inteiro no chão.', 'Mantenha a coluna neutra.', 'Empurre o quadril para trás, em direção ao calcanhar da perna dobrada.', 'Retorne à posição inicial e sinta o alongamento na perna estendida.']),
+('e13', 'Alongamento de Flexores do Quadril', 'Mobilidade', 'Previne o encurtamento dos flexores do quadril e melhora a extensão do quadril durante a corrida.', '2', '45s (cada lado)', '30s', 'https://picsum.photos/seed/hipflexor/800/450', ARRAY['Fique na posição de afundo com um joelho no chão (use um colchonete).', 'Mantenha o tronco reto e contraia o glúteo da perna de trás.', 'Desloque o peso levemente para frente até sentir o alongamento na parte frontal do quadril.', 'Evite arquear excessivamente a lombar.']),
+('e14', 'Dead Bug', 'Core', 'Trabalha a estabilidade do core anterior, essencial para manter a postura durante corridas e chutes.', '3', '10 a 12 (cada lado)', '45s', 'https://picsum.photos/seed/deadbug/800/450', ARRAY['Deite-se de costas, eleve os braços para o teto e dobre os joelhos a 90 graus.', 'Abaixe lentamente um braço para trás da cabeça e, ao mesmo tempo, estenda a perna oposta para perto do chão.', 'Mantenha a lombar pressionada contra o chão.', 'Retorne à posição inicial e repita do outro lado.']),
+('e15', 'Bird Dog', 'Core', 'Foco na estabilidade lombar e pélvica durante movimentos recíprocos de braços e pernas.', '3', '10 (cada lado)', '45s', 'https://picsum.photos/seed/birddog/800/450', ARRAY['Fique em 4 apoios, mantendo as costas retas e o core ativado.', 'Estenda lentamente o braço direito para frente e a perna esquerda para trás.', 'Mantenha a posição por 1 segundo sem deixar o quadril rodar.', 'Retorne à posição inicial e troque de lado.']),
+('e16', 'Prancha', 'Core', 'Exercício isométrico fundamental para resistência do core e transmissão de força.', '3', '45 a 60s', '60s', 'https://picsum.photos/seed/plank/800/450', ARRAY['Apoie os antebraços no chão, alinhados com os ombros.', 'Estenda as pernas e apoie-se nas pontas dos pés.', 'Mantenha o corpo em uma linha reta desde a cabeça até os calcanhares.', 'Contraia abdômen e glúteos intensamente.']),
+('e17', 'Prancha Lateral', 'Core', 'Isometria que fortalece os oblíquos, importantes para a estabilidade lateral e proteção da coluna.', '3', '30 a 45s (cada lado)', '60s', 'https://picsum.photos/seed/sideplank/800/450', ARRAY['Deite-se de lado, apoiando-se no antebraço que deve estar alinhado com o ombro.', 'Empilhe um pé sobre o outro.', 'Eleve o quadril até o corpo formar uma linha reta.', 'Mantenha a posição sem deixar o quadril cair.']),
+('e18', 'Farmer Walk', 'Core', 'Treino de transporte de carga que desenvolve a estabilidade global, pegada e força central sob carga.', '4', '20 a 30 metros', '90s', 'https://picsum.photos/seed/farmerwalk/800/450', ARRAY['Segure um halter pesado ou kettlebell em cada mão.', 'Mantenha a postura reta, ombros para trás e o peito estufado.', 'Caminhe de forma controlada por uma distância determinada.', 'Mantenha os passos curtos e rápidos, evitando o balanço lateral do tronco.']),
+('e19', 'Copenhagen Adduction', 'Prevenção', 'Exige alta estabilidade dos adutores e musculatura do quadril, essencial na prevenção de pubalgia.', '3', '6 a 8 (cada lado)', '60s', 'https://picsum.photos/seed/copenhagen/800/450', ARRAY['Deite-se de lado e coloque o pé de cima em um banco ou caixa.', 'O antebraço fica no chão para suporte, alinhado com o ombro.', 'Eleve o quadril do chão, puxando a perna de baixo em direção ao banco.', 'Desça o quadril lentamente com controle.']),
+('e20', 'Tibial Raise', 'Prevenção', 'Fortalece o músculo tibial anterior, ajudando a prevenir canelite e melhorando a desaceleração.', '3', '15 a 20', '45s', 'https://picsum.photos/seed/tibialraise/800/450', ARRAY['Encoste as costas em uma parede, com os pés um pouco à frente.', 'Mantenha as pernas estendidas e levante as pontas dos pés do chão o máximo que puder.', 'Apoie o peso nos calcanhares.', 'Desça os pés controladamente de volta ao chão.']),
+('e21', 'Panturrilha Unilateral', 'Prevenção', 'Desenvolve a musculatura da panturrilha e tendão de Aquiles para saltos e sprints curtos.', '3', '10 a 12 (cada perna)', '60s', 'https://picsum.photos/seed/calfraises/800/450', ARRAY['Fique de pé em um degrau ou bloco, apoiando apenas a ponta de um dos pés.', 'A outra perna fica suspensa e você pode se apoiar levemente para equilíbrio.', 'Desça o calcanhar o máximo possível sentindo o alongamento.', 'Empurre o corpo para cima até a extensão máxima da panturrilha.']),
+('e22', 'Flexão Plantar Excêntrica', 'Prevenção', 'Exercício chave para a reabilitação e prevenção de tendinopatias no tendão de Aquiles.', '3', '10 a 15 (cada perna)', '60s', 'https://picsum.photos/seed/eccentriccalf/800/450', ARRAY['Suba na ponta dos pés (com as duas pernas).', 'Tire uma perna do chão, deixando todo o peso em uma só.', 'Desça muito lentamente usando apenas a perna de apoio (fase excêntrica).', 'Use as duas pernas para subir novamente.']),
+('e23', 'Rotadores do Quadril com Miniband', 'Prevenção', 'Ativação do glúteo médio e rotadores, músculos que estabilizam o joelho durante as passadas.', '3', '15 (cada lado)', '45s', 'https://picsum.photos/seed/miniband/800/450', ARRAY['Coloque uma miniband logo acima dos joelhos.', 'Fique em posição de meio agachamento atlético.', 'Mantendo um pé fixo, abra o outro joelho lateralmente (rotação externa).', 'Retorne com controle e evite que o tronco gire.']),
+('e24', 'Equilíbrio Unipodal', 'Prevenção', 'Melhora a propriocepção e a força estabilizadora de todo o membro inferior.', '3', '30 a 60s (cada perna)', '45s', 'https://picsum.photos/seed/singlelegbalance/800/450', ARRAY['Fique de pé sobre uma perna, mantendo o joelho de apoio levemente flexionado.', 'Tente manter o equilíbrio sem tocar o outro pé no chão.', 'Para dificultar, você pode fechar os olhos ou ficar sobre uma superfície instável.', 'Mantenha o core firme.']),
+('e25', 'Jump Squat', 'Potência', 'Desenvolve a potência explosiva dos membros inferiores a partir de um agachamento tradicional.', '4', '5 a 6', '90s', 'https://picsum.photos/seed/jumpsquat/800/450', ARRAY['Fique de pé com os pés na largura dos ombros.', 'Desça em um agachamento (até as coxas ficarem quase paralelas).', 'Sem pausas, salte o mais alto possível explosivamente.', 'Aterrisse suavemente, absorvendo o impacto dobrando novamente os joelhos.']),
+('e26', 'Hang Power Clean', 'Potência', 'Exercício olímpico focado em força e velocidade, ideal para a explosão inicial em lances rápidos.', '4', '3 a 5', '2 min', 'https://picsum.photos/seed/hangclean/800/450', ARRAY['Segure a barra com pegada pronada na largura dos ombros.', 'Inicie a partir da posição de pendência (barra acima dos joelhos).', 'Estenda explosivamente o quadril, joelhos e tornozelos.', 'Puxe a barra para cima, rodando os cotovelos sob ela para recebê-la nos ombros (posição de rack).']),
+('e27', 'Lunge Explosivo', 'Potência', 'Foca na potência unilateral e rápida troca de apoios, muito utilizado na aceleração em campo.', '3', '6 a 8 (cada lado)', '90s', 'https://picsum.photos/seed/jumplunge/800/450', ARRAY['Comece na posição de afundo (lunge).', 'Desça o quadril rapidamente e salte explosivamente para cima.', 'No ar, troque a posição das pernas (tesoura).', 'Aterrisse suavemente na posição de afundo oposta e repita.']),
+('e28', 'Medicine Ball Slam', 'Potência', 'Exercício de corpo inteiro que desenvolve potência na cadeia anterior do tronco e braços.', '4', '8 a 10', '60s', 'https://picsum.photos/seed/medballslam/800/450', ARRAY['Segure uma medicine ball (não quicável) com as duas mãos.', 'Levante a bola acima da cabeça estendendo todo o corpo.', 'Jogue a bola com a máxima força em direção ao chão, flexionando o tronco e quadril.', 'Pegue a bola e repita sem perder a cadência.']),
+('e29', 'Medicine Ball Rotacional', 'Potência', 'Treina a transferência de potência das pernas e quadril para o tronco, excelente para chutes.', '3', '8 (cada lado)', '60s', 'https://picsum.photos/seed/medballrotational/800/450', ARRAY['Fique de lado a cerca de um metro de uma parede forte.', 'Segure a medicine ball com as duas mãos na altura da cintura.', 'Gire o tronco e jogue a bola explosivamente contra a parede.', 'Apanhe-a no rebote e repita rapidamente o movimento.']),
+('e30', 'Sprint com Trenó', 'Potência', 'Trabalho de aceleração resistida, ideal para gerar os primeiros passos rápidos na quadra.', '5', '15 a 20 metros', '2 min', 'https://picsum.photos/seed/sledsprint/800/450', ARRAY['Prenda-se ao cinturão do trenó.', 'Posicione o corpo inclinado para a frente com a mecânica correta de aceleração.', 'Arranque de forma explosiva, empurrando o chão com força para trás.', 'Corra a distância estipulada e recupere totalmente.']),
+('e31', 'Back Squat', 'Força Máxima', 'Agachamento com barra nas costas, o exercício base para ganho geral de força nos membros inferiores.', '4', '4 a 6', '3 min', 'https://picsum.photos/seed/backsquat/800/450', ARRAY['Apoie a barra nos trapézios e segure firme.', 'Fique com os pés ligeiramente mais largos que os ombros.', 'Desça o quadril para trás e para baixo até quebrar o paralelo (ou no limite da mobilidade).', 'Empurre de volta à posição inicial estendendo quadril e joelhos.']),
+('e32', 'Hip Thrust', 'Força Máxima', 'Focado principalmente na força de extensão do quadril, essencial para piques e saltos.', '4', '6 a 8', '2 a 3 min', 'https://picsum.photos/seed/hipthrust/800/450', ARRAY['Apoie a parte superior das costas em um banco e coloque uma barra sobre o quadril.', 'Os pés devem ficar no chão afastados na largura dos ombros.', 'Desça o quadril e, em seguida, empurre a barra para cima estendendo o quadril explosivamente.', 'Contraia os glúteos no topo do movimento.']);
 
-
--- Tabela para salvar os planos de treino
-CREATE TABLE IF NOT EXISTS public.training_plans (
+-- Run this to create the plans table for persisting user-generated plans
+CREATE TABLE IF NOT EXISTS plans (
   id text PRIMARY KEY,
   title text NOT NULL,
   phase text NOT NULL,
@@ -33,21 +65,12 @@ CREATE TABLE IF NOT EXISTS public.training_plans (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Permissões para a tabela de planos
-GRANT ALL ON TABLE public.training_plans TO anon;
-GRANT ALL ON TABLE public.training_plans TO authenticated;
-GRANT ALL ON TABLE public.training_plans TO service_role;
-
-ALTER TABLE public.training_plans ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Allow public read access on training_plans" ON public.training_plans;
-CREATE POLICY "Allow public read access on training_plans" ON public.training_plans FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Allow public insert access on training_plans" ON public.training_plans;
-CREATE POLICY "Allow public insert access on training_plans" ON public.training_plans FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow public update access on training_plans" ON public.training_plans;
-CREATE POLICY "Allow public update access on training_plans" ON public.training_plans FOR UPDATE USING (true);
-
-DROP POLICY IF EXISTS "Allow public delete access on training_plans" ON public.training_plans;
-CREATE POLICY "Allow public delete access on training_plans" ON public.training_plans FOR DELETE USING (true);
+ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read access on plans" ON plans;
+CREATE POLICY "Allow public read access on plans" ON plans FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow public insert on plans" ON plans;
+CREATE POLICY "Allow public insert on plans" ON plans FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public update on plans" ON plans;
+CREATE POLICY "Allow public update on plans" ON plans FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Allow public delete on plans" ON plans;
+CREATE POLICY "Allow public delete on plans" ON plans FOR DELETE USING (true);

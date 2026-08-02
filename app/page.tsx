@@ -885,33 +885,43 @@ export default function App() {
 
   useEffect(() => {
     async function loadPlans() {
-      let loadedFromSupabase = false;
-      if (supabase) {
-        try {
-          const { data, error } = await supabase.from('training_plans').select('*');
-          if (!error && data && data.length > 0) {
-            // Sort by created_at descending if needed, or assume they are correct
-            setPlans(data);
-            loadedFromSupabase = true;
+      try {
+        let supabasePlans: TrainingPlan[] = [];
+        if (supabase) {
+          const { data, error } = await supabase.from('plans').select('*');
+          if (!error && data) {
+            supabasePlans = data;
+          } else if (error) {
+            console.warn("Supabase plans table might not exist yet.", error);
           }
-        } catch (e) {
-          console.error("Supabase plans fetch error", e);
         }
-      }
-
-      if (!loadedFromSupabase) {
-        const savedPlans = localStorage.getItem('futsal_training_plans');
-        if (savedPlans) {
+        
+        const localPlansStr = localStorage.getItem('futsal_training_plans');
+        let localPlans: TrainingPlan[] = [];
+        if (localPlansStr) {
           try {
-            setPlans(JSON.parse(savedPlans));
-          } catch (e) {
-            console.error('Failed to parse plans from local storage', e);
+            localPlans = JSON.parse(localPlansStr);
+          } catch (e) {}
+        }
+        
+        const mergedPlans = [...supabasePlans];
+        for (const localPlan of localPlans) {
+          if (!mergedPlans.find(p => p.id === localPlan.id)) {
+            mergedPlans.push(localPlan);
           }
         }
+        
+        if (mergedPlans.length > 0) {
+          setPlans(mergedPlans);
+        } else {
+          setPlans(INITIAL_TRAINING_PLANS);
+        }
+      } catch (err) {
+        console.error("Error loading plans:", err);
+      } finally {
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
     }
-    
     loadPlans();
   }, []);
 
@@ -919,18 +929,38 @@ export default function App() {
     if (isLoaded) {
       localStorage.setItem('futsal_training_plans', JSON.stringify(plans));
       
-      const saveToSupabase = async () => {
+      async function syncToSupabase() {
         if (!supabase) return;
         try {
-          if (plans.length > 0) {
-            await supabase.from('training_plans').upsert(plans);
+          const { data: existingPlans, error: fetchError } = await supabase.from('plans').select('id');
+          if (fetchError) {
+             console.warn("Skipping sync: plans table might not exist.", fetchError);
+             return;
+          }
+          const existingIds = existingPlans?.map(p => p.id) || [];
+          
+          const currentIds = plans.map(p => p.id);
+          const idsToDelete = existingIds.filter(id => !currentIds.includes(id));
+          
+          if (idsToDelete.length > 0) {
+            await supabase.from('plans').delete().in('id', idsToDelete);
+          }
+          
+          for (const p of plans) {
+            await supabase.from('plans').upsert({
+              id: p.id,
+              title: p.title,
+              phase: p.phase,
+              duration: p.duration,
+              description: p.description,
+              days: p.days
+            });
           }
         } catch (e) {
-          console.error("Failed to sync plans to Supabase", e);
+          console.error("Failed to sync plans to supabase", e);
         }
-      };
-      
-      saveToSupabase();
+      }
+      syncToSupabase();
     }
   }, [plans, isLoaded]);
   
@@ -1079,21 +1109,12 @@ export default function App() {
     setDeleteConfirmId(id);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = () => {
     if (deleteConfirmId) {
       setPlans(prev => prev.filter(p => p.id !== deleteConfirmId));
       if (selectedPlanId === deleteConfirmId) {
         setSelectedPlanId(null);
       }
-      
-      if (supabase) {
-        try {
-          await supabase.from('training_plans').delete().eq('id', deleteConfirmId);
-        } catch (e) {
-          console.error("Failed to delete plan from Supabase", e);
-        }
-      }
-      
       setDeleteConfirmId(null);
     }
   };
@@ -1146,7 +1167,7 @@ export default function App() {
 
   const handleDrop = (e: React.DragEvent, dayIndex: number, dropIndex: number) => {
     e.preventDefault();
-    if (!draggedItem || draggedItem.dayIndex !== dayIndex || draggedItem.exerciseIndex === dropIndex) {
+    if (!draggedItem || (draggedItem.dayIndex === dayIndex && draggedItem.exerciseIndex === dropIndex)) {
       handleDragEnd();
       return;
     }
@@ -1155,15 +1176,26 @@ export default function App() {
       setPlans(prev => prev.map(p => {
         if (p.id === selectedPlanId) {
           const newDays = [...p.days];
-          const newExercises = [...newDays[dayIndex].exercises];
+          const sourceDay = newDays[draggedItem.dayIndex];
+          const targetDay = newDays[dayIndex];
           
-          const [draggedExercise] = newExercises.splice(draggedItem.exerciseIndex, 1);
-          newExercises.splice(dropIndex, 0, draggedExercise);
+          const sourceExercises = [...sourceDay.exercises];
+          const targetExercises = dayIndex === draggedItem.dayIndex ? sourceExercises : [...targetDay.exercises];
+          
+          const [draggedExercise] = sourceExercises.splice(draggedItem.exerciseIndex, 1);
+          targetExercises.splice(dropIndex, 0, draggedExercise);
 
-          newDays[dayIndex] = {
-            ...newDays[dayIndex],
-            exercises: newExercises
+          newDays[draggedItem.dayIndex] = {
+            ...sourceDay,
+            exercises: sourceExercises
           };
+          
+          if (dayIndex !== draggedItem.dayIndex) {
+             newDays[dayIndex] = {
+               ...targetDay,
+               exercises: targetExercises
+             };
+          }
 
           return { ...p, days: newDays };
         }
@@ -1172,6 +1204,50 @@ export default function App() {
     }
     handleDragEnd();
   };
+  const handleMoveExerciseUp = (e: React.MouseEvent, dayIndex: number, exerciseIndex: number) => {
+    e.stopPropagation();
+    if (selectedPlanId && exerciseIndex > 0) {
+      setPlans(prev => prev.map(p => {
+        if (p.id === selectedPlanId) {
+          const newDays = [...p.days];
+          const newExercises = [...newDays[dayIndex].exercises];
+          const temp = newExercises[exerciseIndex - 1];
+          newExercises[exerciseIndex - 1] = newExercises[exerciseIndex];
+          newExercises[exerciseIndex] = temp;
+          newDays[dayIndex] = {
+            ...newDays[dayIndex],
+            exercises: newExercises
+          };
+          return { ...p, days: newDays };
+        }
+        return p;
+      }));
+    }
+  };
+
+  const handleMoveExerciseDown = (e: React.MouseEvent, dayIndex: number, exerciseIndex: number) => {
+    e.stopPropagation();
+    if (selectedPlanId) {
+      setPlans(prev => prev.map(p => {
+        if (p.id === selectedPlanId) {
+          const newDays = [...p.days];
+          const newExercises = [...newDays[dayIndex].exercises];
+          if (exerciseIndex < newExercises.length - 1) {
+            const temp = newExercises[exerciseIndex + 1];
+            newExercises[exerciseIndex + 1] = newExercises[exerciseIndex];
+            newExercises[exerciseIndex] = temp;
+          }
+          newDays[dayIndex] = {
+            ...newDays[dayIndex],
+            exercises: newExercises
+          };
+          return { ...p, days: newDays };
+        }
+        return p;
+      }));
+    }
+  };
+
   const handleRemoveExerciseFromPlan = (e: React.MouseEvent, dayIndex: number, exerciseIndex: number) => {
     e.stopPropagation();
     if (selectedPlanId) {
@@ -1516,6 +1592,24 @@ export default function App() {
                               )}
                             </div>
                             <div className="flex items-center gap-1">
+                              {eIdx > 0 && (
+                                <button
+                                  onClick={(e) => handleMoveExerciseUp(e, dIdx, eIdx)}
+                                  className="p-2 text-zinc-600 hover:text-lime-400 hover:bg-lime-400/10 rounded transition-colors"
+                                  title="Mover para cima"
+                                >
+                                  <ChevronUp className="w-4 h-4" />
+                                </button>
+                              )}
+                              {eIdx < day.exercises.length - 1 && (
+                                <button
+                                  onClick={(e) => handleMoveExerciseDown(e, dIdx, eIdx)}
+                                  className="p-2 text-zinc-600 hover:text-lime-400 hover:bg-lime-400/10 rounded transition-colors"
+                                  title="Mover para baixo"
+                                >
+                                  <ChevronDown className="w-4 h-4" />
+                                </button>
+                              )}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -2119,12 +2213,12 @@ export default function App() {
                             : 'bg-zinc-900/50 hover:bg-zinc-800 border-transparent hover:border-zinc-700'
                         }`}
                       >
-                        <span className="block">
-                          <span className={`block font-bold text-sm transition-colors ${isAlreadyAdded ? 'text-zinc-500' : 'text-zinc-200 group-hover:text-lime-400'}`}>
+                        <div>
+                          <h4 className={`font-bold text-sm transition-colors ${isAlreadyAdded ? 'text-zinc-500' : 'text-zinc-200 group-hover:text-lime-400'}`}>
                             {ex.title} {isAlreadyAdded && '(Já adicionado)'}
-                          </span>
-                          <span className="block text-xs text-zinc-500 mt-1">{ex.category}</span>
-                        </span>
+                          </h4>
+                          <p className="text-xs text-zinc-500 mt-1">{ex.category}</p>
+                        </div>
                         {!isAlreadyAdded && (
                           <Plus className="w-4 h-4 text-zinc-600 group-hover:text-lime-400 transition-colors" />
                         )}
