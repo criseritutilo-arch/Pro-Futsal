@@ -1001,7 +1001,7 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
   }, [plans, isLoaded]);
   
   // AI Form State
-  const [showAiModal, setShowAiModal] = useState(false);
+  const [planModalMode, setPlanModalMode] = useState<'ai' | 'manual' | null>(null);
   const [aiPhase, setAiPhase] = useState<'Pré-temporada' | 'Competitivo' | 'Transição'>('Pré-temporada');
   const [aiWeeks, setAiWeeks] = useState(4);
   const [aiDaysPerWeek, setAiDaysPerWeek] = useState(5);
@@ -1090,23 +1090,29 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
     setPlayingVideo(false);
   };
 
-  const handleCreateManualPlan = () => {
+  const handleCreateManualPlanSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const days: any[] = [];
+    for (let i = 0; i < aiDaysPerWeek; i++) {
+      days.push({
+        dayName: `Dia ${i + 1}`,
+        focus: (aiDaysFocus[i] || ['Misto']).join(' & '),
+        exercises: []
+      });
+    }
+
     const newPlan: TrainingPlan = {
       id: `p_manual_${Date.now()}`,
-      title: 'Novo Plano de Treino',
-      phase: 'Pré-temporada',
-      duration: '4 Semanas',
-      description: 'Descrição do novo plano.',
-      days: [
-        {
-          dayName: 'Dia 1',
-          focus: 'Misto',
-          exercises: []
-        }
-      ]
+      title: 'Novo Plano Manual',
+      phase: aiPhase,
+      duration: `${aiWeeks} Semana(s)`,
+      description: 'Plano criado manualmente.',
+      days: days
     };
+    
     setPlans(prev => [newPlan, ...prev]);
     setSelectedPlanId(newPlan.id);
+    setPlanModalMode(null);
   };
 
   const handleGeneratePlan = async (e: React.FormEvent) => {
@@ -1143,7 +1149,7 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
       };
 
       setPlans(prev => [newPlan, ...prev]);
-      setShowAiModal(false);
+      setPlanModalMode(null);
       setSelectedPlanId(newPlan.id);
     } catch (err: any) {
       console.warn(err);
@@ -1738,14 +1744,14 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
                 </div>
                 <div className="hidden sm:flex items-center gap-2">
                   <button 
-                    onClick={handleCreateManualPlan}
+                    onClick={() => setPlanModalMode('manual')}
                     className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded font-bold text-sm transition-colors border border-zinc-700"
                   >
                     <Plus className="w-4 h-4 text-lime-400" />
                     <span>Criar Manualmente</span>
                   </button>
                   <button 
-                    onClick={() => setShowAiModal(true)}
+                    onClick={() => setPlanModalMode('ai')}
                     className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded font-bold text-sm transition-colors border border-zinc-700"
                   >
                     <Wand2 className="w-4 h-4 text-lime-400" />
@@ -1757,14 +1763,14 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
               {/* Mobile AI Button */}
               <div className="sm:hidden grid grid-cols-2 gap-2 mb-4">
                 <button 
-                  onClick={handleCreateManualPlan}
+                  onClick={() => setPlanModalMode('manual')}
                   className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors border border-zinc-700"
                 >
                   <Plus className="w-4 h-4 text-lime-400" />
                   <span>Criar Manual</span>
                 </button>
                 <button 
-                  onClick={() => setShowAiModal(true)}
+                  onClick={() => setPlanModalMode('ai')}
                   className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors border border-zinc-700"
                 >
                   <Wand2 className="w-4 h-4 text-lime-400" />
@@ -1882,7 +1888,7 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
 
       {/* AI Generate Modal */}
       <AnimatePresence>
-        {showAiModal && (
+        {planModalMode !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1898,16 +1904,18 @@ export default function App({ supabaseUrl, supabaseAnonKey }: { supabaseUrl?: st
               <div className="flex justify-between items-center p-5 border-b border-zinc-800">
                 <div className="flex items-center gap-2">
                   <Wand2 className="w-5 h-5 text-lime-400" />
-                  <h3 className="text-lg font-bold">Gerar Plano com IA</h3>
+                  <h3 className="text-lg font-bold">
+                    {planModalMode === 'ai' ? 'Gerar Plano com IA' : 'Criar Plano Manual'}
+                  </h3>
                 </div>
                 <button 
-                  onClick={() => setShowAiModal(false)}
+                  onClick={() => setPlanModalMode(null)}
                   className="p-1 text-zinc-400 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <form onSubmit={handleGeneratePlan} className="p-5 space-y-5">
+              <form onSubmit={planModalMode === "ai" ? handleGeneratePlan : handleCreateManualPlanSubmit} className="p-5 space-y-5">
                 <div>
                   <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">Fase do Treinamento</label>
                   <select 
