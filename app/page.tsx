@@ -941,11 +941,16 @@ export default function App() {
           }
         }
         
-        if (mergedPlans.length > 0) {
-          setPlans(mergedPlans);
-        } else {
-          setPlans(INITIAL_TRAINING_PLANS);
+        // Ensure default plans are always present if not explicitly deleted
+        // Wait, if they were explicitly deleted, they won't be in mergedPlans, but adding them back might be annoying.
+        // Let's just say for the sake of this issue, we add them if they are missing.
+        for (const defaultPlan of INITIAL_TRAINING_PLANS) {
+          if (!mergedPlans.find(p => p.id === defaultPlan.id)) {
+            mergedPlans.push(defaultPlan);
+          }
         }
+        
+        setPlans(mergedPlans);
       } catch (err) {
         console.error("Error loading plans:", err);
       } finally {
@@ -1082,6 +1087,25 @@ export default function App() {
   const handleExerciseSelect = (id: string) => {
     setSelectedExerciseId(id);
     setPlayingVideo(false);
+  };
+
+  const handleCreateManualPlan = () => {
+    const newPlan: TrainingPlan = {
+      id: `p_manual_${Date.now()}`,
+      title: 'Novo Plano de Treino',
+      phase: 'Pré-temporada',
+      duration: '4 Semanas',
+      description: 'Descrição do novo plano.',
+      days: [
+        {
+          dayName: 'Dia 1',
+          focus: 'Misto',
+          exercises: []
+        }
+      ]
+    };
+    setPlans(prev => [newPlan, ...prev]);
+    setSelectedPlanId(newPlan.id);
   };
 
   const handleGeneratePlan = async (e: React.FormEvent) => {
@@ -1711,23 +1735,41 @@ export default function App() {
                   <h2 className="text-3xl font-black italic uppercase leading-none mb-2">Periodização</h2>
                   <p className="text-zinc-400">Planos de treino estruturados para alta performance.</p>
                 </div>
-                <button 
-                  onClick={() => setShowAiModal(true)}
-                  className="hidden sm:flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded font-bold text-sm transition-colors border border-zinc-700"
-                >
-                  <Wand2 className="w-4 h-4 text-lime-400" />
-                  <span>Gerar Plano</span>
-                </button>
+                <div className="hidden sm:flex items-center gap-2">
+                  <button 
+                    onClick={handleCreateManualPlan}
+                    className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded font-bold text-sm transition-colors border border-zinc-700"
+                  >
+                    <Plus className="w-4 h-4 text-lime-400" />
+                    <span>Criar Manualmente</span>
+                  </button>
+                  <button 
+                    onClick={() => setShowAiModal(true)}
+                    className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded font-bold text-sm transition-colors border border-zinc-700"
+                  >
+                    <Wand2 className="w-4 h-4 text-lime-400" />
+                    <span>Gerar Plano</span>
+                  </button>
+                </div>
               </div>
 
               {/* Mobile AI Button */}
-              <button 
-                onClick={() => setShowAiModal(true)}
-                className="sm:hidden w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors border border-zinc-700 mb-4"
-              >
-                <Wand2 className="w-4 h-4 text-lime-400" />
-                <span>Gerar Plano com IA</span>
-              </button>
+              <div className="sm:hidden grid grid-cols-2 gap-2 mb-4">
+                <button 
+                  onClick={handleCreateManualPlan}
+                  className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors border border-zinc-700"
+                >
+                  <Plus className="w-4 h-4 text-lime-400" />
+                  <span>Criar Manual</span>
+                </button>
+                <button 
+                  onClick={() => setShowAiModal(true)}
+                  className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-3 rounded-xl font-bold text-sm transition-colors border border-zinc-700"
+                >
+                  <Wand2 className="w-4 h-4 text-lime-400" />
+                  <span>Gerar c/ IA</span>
+                </button>
+              </div>
 
               <div className="grid gap-4">
                 {plans.map(plan => (
