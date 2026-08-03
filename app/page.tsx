@@ -859,6 +859,36 @@ const INITIAL_TRAINING_PLANS: TrainingPlan[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'p3',
+    title: 'Plano de Pré-temporada de Elite - Futsal',
+    phase: 'Pré-temporada',
+    duration: '4 Semanas',
+    description: 'Programa de 4 semanas focado no desenvolvimento de força e potência de membros inferiores para atletas de futsal de alto rendimento, utilizando o agachamento como exercício central de progressão.',
+    days: [
+      {
+        dayName: 'Dia 1',
+        focus: 'Força Máxima',
+        exercises: [
+          { exerciseId: 'e1', notes: 'Agachamento Livre - Realizar 4 séries de 6 repetições com 80% de 1RM. Cadência controlada na descida.' }
+        ]
+      },
+      {
+        dayName: 'Dia 2',
+        focus: 'Potência e Velocidade',
+        exercises: [
+          { exerciseId: 'e1', notes: 'Agachamento Potência - Realizar 5 séries de 3 repetições com 60% de 1RM, focando na velocidade máxima de subida.' }
+        ]
+      },
+      {
+        dayName: 'Dia 3',
+        focus: 'Resistência de Força',
+        exercises: [
+          { exerciseId: 'e1', notes: 'Agachamento de Sobrecarga Progressiva - Realizar 3 séries de 10 repetições com 70% de 1RM, com foco em técnica e amplitude completa.' }
+        ]
+      }
+    ]
   }
 ];
 
